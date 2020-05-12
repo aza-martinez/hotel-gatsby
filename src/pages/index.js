@@ -1,21 +1,66 @@
 import React from "react"
-import { Link } from "gatsby"
+import Layout from "./../components/Layout"
+import ImagenHotel from "../components/ImagenHotel"
+import ContenidoInicio from "../components/ContenidoInicio"
+import useHabitaciones from "./../hooks/useHabitaciones"
+import { css } from '@emotion/core';
+import HabitacionPreview from "../components/HabitacionPreview"
+import styled from '@emotion/styled';
+import { graphql } from "gatsby"
 
-import Layout from "../components/layout"
-import Image from "../components/image"
-import SEO from "../components/seo"
+const ListadoHabitaciones = styled.ul`
+  max-width: 1200px;
+  width: 95%;
+  margin: 4rem auto 0 auto;
 
-const IndexPage = () => (
-  <Layout>
-    <SEO title="Home" />
-    <h1>Hi people</h1>
-    <p>Welcome to your new Gatsby site.</p>
-    <p>Now go build something great.</p>
-    <div style={{ maxWidth: `300px`, marginBottom: `1.45rem` }}>
-      <Image />
-    </div>
-    <Link to="/page-2/">Go to page 2</Link>
-  </Layout>
-)
+  @media (min-width: 768px) {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 3rem;
+  }
+`;
 
-export default IndexPage
+const IndexPage = ({ data }) => {
+  
+  const habitaciones = data.allDatoCmsHabitacion.nodes;
+
+  return (
+    <Layout>
+      <ImagenHotel />
+      <ContenidoInicio />
+
+      <h2 css={css`
+        text-align: center;
+        margin-top: 5rem;
+        font-size: 3rem;
+      `}>Nuestras Habitaciones</h2>
+
+      <ListadoHabitaciones>
+        {habitaciones.map(habitacion => (
+          <HabitacionPreview habitacion={habitacion} key={habitacion.id} />
+        ))}
+      </ListadoHabitaciones>
+
+    </Layout>
+  )
+}
+
+export default IndexPage;
+
+export const query = graphql`
+query {
+  allDatoCmsHabitacion {
+    nodes {
+      titulo
+      id
+      slug
+      contenido
+      imagen {
+        fluid(maxWidth: 1200) {
+          ...GatsbyDatoCmsFluid
+        }
+      }
+    }
+  }
+}
+`;
